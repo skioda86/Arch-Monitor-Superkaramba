@@ -1,0 +1,291 @@
+################################################################
+# ArchMonitorSkioda86 - COMPLETO                               #
+# Author: Skioda86                                             #
+# Licence: GPL v2                                              #
+#                                                              #
+# Informazioni su comandi superKaramba                         #
+# http://guide.debianizzati.org/index.php/Superkaramba#sensor  #
+#                                                              #
+################################################################
+
+karamba x=20 y=150 w=240 h=900
+
+defaultfont font="Verdana" fontsize=11 color=255,255,255 shadow=0
+
+#############################################################
+#                                                           #
+#                        Logo e Titolo                      #
+#                                                           #
+#############################################################
+<group> x=0 y=0
+    image x=15 y=0 path="image/arch_logo.png"
+
+    text x=65 y=10 value="Arch" fontsize=25 color=255,255,255
+    text x=120 y=10 value="MaXOSX" fontsize=25 color=0,200,255
+
+    # Utente e hostname
+    text x=87 y=35 sensor=program program="echo ${USER}@`hostname`"
+</group>
+
+
+#############################################################
+#                                                           #
+#                      Info di Sistema                      #
+#                                                           #
+#############################################################
+
+<group> x=5 y=40
+
+    text x=5 y=14 value="Kernel:"
+        text x=220 y=14  sensor=program program="uname -r" color=0,200,255 align=right
+
+    text x=5 y=26 value="Architettura:"
+        text x=220 y=26  sensor=program program="uname -m" color=0,100,255 align=right
+
+    text x=5 y=38 value="KDE:"
+        text x=220 y=38  sensor=program program="(kded4 --version || kded --version) | grep KDE | awk '{ print $NF }' | sed '/\$/d' | head -1" color=0,200,255 align=right
+
+    text x=5 y=50 value="Tempo accensione:"
+        text x=220 y=50  sensor=uptime format="%dg %Hh:%Mm" color=0,100,255 align=right
+
+    bar x=0 y=72 w=220 h=1 path="image/lineblank.png" vertical=true value=100
+</group>
+
+
+#############################################################
+#                                                           #
+#                      Info sulla CPU                       #
+#                                                           #
+#############################################################
+
+
+<group> x=0 y=105
+    
+    # Famiglia processore
+    text x=23 y=12 sensor=program program="cat /proc/cpuinfo | grep 'model name' | awk '{print $4, $5, $6, $9}' | tail -1" interval=3600000
+
+    # Modello processore
+    text x=205 y=10 sensor=program program="cat /proc/cpuinfo | grep 'model name' | awk '{print $4, $5, $6, $7}' | line 1" align=right
+    
+    
+    # CPU_0
+    text x=10 y=29 value="CPU 0:"
+        text x=55 y=29 sensor=CPU cpu=0 format="%v%" color=0,200,255
+    
+    text x=10 y=40 value=" Temp:"
+        text x=55 y=40 sensor=Sensor type="Core 0" color=0,200,255
+    
+    text x=10 y=51 value=" Clock:" 
+        text x=55 y=51	sensor=program program="cat /proc/cpuinfo | grep 'cpu MHz' | cut -d ' ' -f 3 | cut -d '.' -f 1 | tail -1" interval=1000 color=0,200,255
+
+    
+    # CPU_1
+    text x=10 y=67 value="CPU 1:"
+        text x=55 y=67 sensor=CPU cpu=1 format="%v%" color=0,100,255
+
+    text x=10 y=78 value=" Temp:"
+        text x=55 y=78 sensor=Sensor type="Core 1" color=0,100,255
+
+    text x=10 y=89 value=" Clock:" 
+        text x=55 y=89	sensor=program program="cat /proc/cpuinfo | grep 'cpu MHz' | cut -d ' ' -f 3 | cut -d '.' -f 1 | sed '2,2!d'" interval=1000 color=0,100,255
+
+  
+    # Grafico carico CPU_0 e CPU_1
+    graph x=102 y=27 w=120 h=35 points=100 color=0,200,255 sensor=cpu cpu=0
+    graph x=102 y=27 w=120 h=35 points=100 color=0,100,255 sensor=cpu cpu=1
+
+    # Grafico temperatura
+    graph x=102 y=65 w=120 h=35 points=100 color=0,200,255 sensor=Sensor type="Core 0" min=40
+    graph x=102 y=65 w=120 h=35 points=100 color=0,100,255 sensor=Sensor type="Core 1" min=40
+
+    # Velocità Ventola
+    text x=10 y=110 value="VENTOLA:"
+        text x=70 y=110 color=0,200,255 sensor=program program="sensors | grep 'Exhaust' | cut -d ' ' -f 6,7" interval=1000
+
+
+
+    bar x=5 y=134 w=220 h=1 path="image/lineblank.png" vertical=true value=100
+</group>
+
+
+#############################################################
+#                                                           #
+#                   Info della Memoria                      #
+#                                                           #
+#############################################################
+
+<group> x=5 y=240
+    text x=170 y=5 value="Memoria"
+        
+        text x=10 y=40 value="RAM:" 
+            text x=55 y=25 value="In Uso  Totale  Libera  Cache"
+                text x=58 y=40 sensor=Memory format="%umb" color=0,100,255
+                text x=101 y=40 sensor=Memory format="%tm" color=0,100,255
+                text x=141 y=40 sensor=Memory format="%fm" color=0,100,255
+    
+    ###text x=10 y=55 value="Swap:"
+    ###text x=175 y=40 sensor=program program="free -mo | sed -e '/total/d' -e '/Swap/d'| awk '{print $7}'" color=0,100,255 interval=3000
+    ###text x=55 y=55 sensor=Memory format="%ts" color=0,200,255
+    ###text x=92 y=55 sensor=Memory format="%us" color=0,200,255
+    ###text x=134 y=55 sensor=Memory format="%fs" color=0,200,255
+
+    bar x=65 y=60 path="image/jauge.png" sensor=memory format="%umb" interval=5000
+        image x=62 y=56 path="image/jauge_fond.png"
+
+
+    bar x=5 y=80 w=220 h=1 path="image/lineblank.png" vertical=true value=100
+</group>
+
+
+#############################################################
+#                                                           #
+#                      Info Filesystem                      #
+#                                                           #
+#############################################################
+
+
+<group> x=5 y=320
+
+    text x=135 y=5 value="Gestione Disco"
+
+        ### /
+        text x=15 y=31 value="/"
+            text x=210 y=22 sensor=DISK format="%up%  /  %u  of  %t Mb" fontsize=9 font="Verdana" mountpoint="/" color=35,164,255 align=right interval=100000
+            
+            bar x=65 y=37 sensor=DISK vertical=false path="image/jauge.png" mountpoint="/" interval=100000
+            
+            image x=62 y=33 vertical=false path="image/jauge_fond.png"
+
+        ### /home
+        text x=15 y=58 value="/home"
+            text x=210 y=47 sensor=DISK format="%up%  /  %u  of  %t Mb" fontsize=9 font="Verdana" mountpoint="/home" color=35,164,255 align=right interval=100000
+
+            bar x=65 y=62 sensor=DISK vertical=false path="image/jauge.png" mountpoint="/home" interval=100000
+
+            image x=62 y=58 vertical=false path="image/jauge_fond.png"
+
+
+    bar x=5 y=82 w=220 h=1 path="image/lineblank.png" vertical=true value=100
+
+    ###text x=80 y=10 value="Uso de los discos"
+    ###text x=-6 y=25 sensor=program program="df -h | cut -c21- | line 1" color=255,255,255 ###font=Courier fontsize=12
+    ###text x=5 y=40 sensor=program program="df -h | sed '/LogVol/d'| cut -c23- | grep /" ###interval=600000 color=0,200,250 font=Courier fontsize=12
+</group>
+
+
+
+#############################################################
+#                                                           #
+#                        Info di Rete                       #
+#                                                           #
+#############################################################
+
+<group> x=5 y=400
+
+    text x=173 y=5 value="Network" 
+
+    text x=10 y=25 value="IP-Pubblico:"
+        text x=140 y=25 sensor=program program="rm -rf .jftgwh ; mkdir .jftgwh ; cd .jftgwh ; wget http://checkip.dyndns.org/index.html && cat index.html | cut -d ' ' -f 6 | cut -d '<' -f 1 ; cd .. ; rm -rf .jftgwh" color=0,100,255 interval=35000
+
+    # wlan0
+    text x=10 y=38 value="wlan0" color=200,200,200
+        text x=20 y=50 value="ESSID:"
+            text x=90 y=50 sensor=program program="interface=wlan0 ; if [ -x /usr/sbin/iwconfig ]; then /usr/sbin/iwconfig $interface |grep 'ESSID' | sed -s 's/.*://'; else /sbin/iwconfig $interface |grep 'ESSID' | sed -s 's/.*://'; fi" color=0,255,255
+
+        text x=20 y=62 value="IP-Privato:"
+            text x=140 y=62 sensor=program program="interface=wlan0 ;/sbin/ifconfig $interface |grep 'inet ' |awk '{print $2}'" color=0,100,255 interval=35000
+
+        text x=20 y=76 value="Downstream:"
+            text x=160 y=76 sensor=network device="wlan0" format="%in kB/s" decimals=1 color=0,200,255
+
+        text x=20 y=88 value="Upstream:"
+            text x=160 y=88 sensor=network device="wlan0" format="%out kB/s" decimals=1 color=0,200,255
+    
+    # eth0usb
+    text x=10 y=103 value="eth0usb" color=200,200,200
+        text x=20 y=115 value="IP-Privato:"
+            text x=140 y=115 sensor=program program="interface=eth0usb ;/sbin/ifconfig $interface |grep 'inet ' |awk '{print $2}'" color=0,100,255 interval=35000
+        text x=20 y=129 value="Downstream:"
+            text x=160 y=129 sensor=network device="eth0usb" format="%in kB/s" decimals=1 color=0,200,255
+        text x=20 y=141 value="Upstream:"
+            text x=160 y=141 sensor=network device="eth0usb" format="%out kB/s" decimals=1 color=0,200,255
+    
+
+
+
+    ###text x=10 y=25 value="Descarga:"
+    ###text x=140 y=26 sensor=network device="wlan0" format="%in kB/s" decimals=1 color=0,200,255 interval=1000 align=right
+    ###text x=10 y=37 value="Subida:"
+    ###text x=140 y=37 sensor=network device="wlan0" format="%out kB/s" decimals=1 color=0,100,255 interval=1000 align=right
+    ###text x=210 y=25 sensor=program program="/sbin/ifconfig wlan0 | grep 'TX byte' | awk '{print $3 $4}'" interval=30000 color=0,200,255 align=right
+    ###text x=210 y=37 sensor=program program="/sbin/ifconfig wlan0 | grep 'RX byte' | awk '{print $7 $8}'" interval=30000 color=0,100,255 align=right
+
+    ###text x=10 y=55 value="IP interna:"
+    ###text x=10 y=67 value="IP externa:"
+    ###text x=180 y=55 sensor=program program="/sbin/ifconfig wlan0 | grep 'inet ' | cut -d : -f2 | cut -d ' ' -f1" interval=60000 align=right color=0,200,255
+    ###text x=180 y=67  sensor=program program="rm -rf .temp ; mkdir .temp ; cd .temp ; wget http://checkip.dyndns.org/index.html && cat index.html | cut -d ' ' -f 6 | cut -d '<' -f #1 ; cd .. ; rm -rf .temp" interval=60000 align=right color=0,100,255
+
+    bar x=0 y=161 w=225 h=1 path="image/lineblank.png" vertical=true value=100
+</group>
+
+
+#############################################################
+#                                                           #
+#                Info Connessioni TPC e UDP                 #
+#                                                           #
+#############################################################
+
+<group> x=5 y=555
+    
+    # Numero connessioni ATTIVE STABILITE
+    text x=150 y=10 value="Connessioni"
+        text x=127 y=12 sensor=program program="netstat -t | grep -c ESTABLISHED" interval=4000 fontsize=9
+     
+
+    text x=0 y=26  value="Local"
+        text x=0 y=38  fontsize=10 sensor=program program="netstat -ntup | grep ESTABLISHED | awk '{print $4}' | tail -n8 | cut -d ':' -f 2" color=0,100,255 font="monospace" interval=5000
+
+    text x=35 y=26 value="Remote"
+        text x=35 y=38 fontsize=10 sensor=program program="netstat -ntup | grep ESTABLISHED | awk '{print $5}' | tail -n8" color=0,100,255 font="monospace" interval=5010
+
+    text x=174 y=26 value="Process"
+        text x=174 y=38 fontsize=10 sensor=program program="netstat -ntup | grep ESTABLISHED | awk '{print $7}' | tail -n8 | cut -d '/' -f 2"  color=0,200,255 font="monospace" interval=5020
+
+    text x=150 y=26 value="T/U"
+        text x=157 y=38 fontsize=10 sensor=program program="netstat -ntup | grep ESTABLISHED | awk '{print $1}' | tail -n8 | cut -d '/' -f 2 | cut -c1"  color=0,200,255 font="monospace" interval=5020
+
+
+    bar x=0 y=127 w=225 h=1 path="image/lineblank.png" vertical=true value=100
+
+</group>
+
+
+#############################################################
+#                                                           #
+#                 Info Processi di Sistema                  #
+#                                                           #
+#############################################################
+
+<group> x=5 y=680
+
+    text x=173 y=5 value="Processi"
+
+    text x=0 y=25 value="Command"
+        text	x=0	y=39	fontsize=9 color=color=0,200,255	sensor=program program="ps axo comm,user,pcpu --sort -pcpu | head -8 | sed '1,1d' | awk '{print $1}'"	interval=5000
+
+    text x=120 y=25 value="PID"
+        text	x=116 y=39	fontsize=9 color=color=0,100,255	sensor=program program="ps axo pid,comm,user,pcpu --sort -pcpu | head -8 | sed '1,1d' | awk '{print $1}'"	interval=5000
+
+    text x=157 y=25 value="%"
+        text	x=155 y=39	fontsize=9 color=color=0,100,255	sensor=program program="ps axo comm,user,pcpu --sort -pcpu | head -8 | sed '1,1d' | awk '{print $3}'"	interval=5000
+    
+    text x=185 y=25 value="User"
+        text	x=178 y=39	fontsize=9 color=color=0,200,255	sensor=program program="ps axo comm,user,pcpu --sort -pcpu | head -8 | sed '1,1d' | awk '{print $2}'"	interval=5000
+
+    text x=50 y=125 value="Carico di Sistema:"
+        text x=160 y=125 color=0,200,255 sensor=cpu cpu=all format=%system% interval=5000
+
+    text x=50 y=137 value="Carico di User:"
+        text x=160 y=137 color=0,200,255 sensor=cpu cpu=all format=%user% interval=5000
+
+</group>
