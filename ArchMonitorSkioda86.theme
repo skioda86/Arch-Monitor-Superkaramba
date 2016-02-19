@@ -21,7 +21,7 @@ defaultfont font="Verdana" fontsize=11 color=255,255,255 shadow=0
     image x=15 y=0 path="image/arch_logo.png"
 
     text x=65 y=10 value="Arch" fontsize=25 color=255,255,255
-    text x=120 y=10 value="MaXOSX" fontsize=25 color=0,200,255
+    text x=120 y=10 value="XPSkioda" fontsize=25 color=0,200,255
 
     # Utente e hostname
     text x=87 y=35 sensor=program program="echo ${USER}@`hostname`"
